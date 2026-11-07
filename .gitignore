@@ -1,0 +1,21 @@
+# Build outputs and generated packages
+dist/
+build/
+.gradle/
+*.apk
+*.aab
+*.ipk
+
+# Signing keys and secrets
+*.jks
+*.keystore
+keystore.properties
+local.properties
+webos/js/config.local.js
+.env
+
+# IDE / OS
+.idea/
+*.iml
+.DS_Store
+node_modules/

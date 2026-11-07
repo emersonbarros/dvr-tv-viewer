@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#101010">
+
+    <LinearLayout
+        android:layout_width="480dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configurações do DVR"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:layout_marginBottom="16dp" />
+
+        <TextView style="@style/SettingsLabel" android:text="Endereço IP" />
+        <EditText android:id="@+id/host" style="@style/SettingsField" android:inputType="text" />
+
+        <TextView style="@style/SettingsLabel" android:text="Porta RTSP" />
+        <EditText android:id="@+id/port" style="@style/SettingsField" android:inputType="number" />
+
+        <TextView style="@style/SettingsLabel" android:text="Usuário" />
+        <EditText android:id="@+id/user" style="@style/SettingsField" android:inputType="text" />
+
+        <TextView style="@style/SettingsLabel" android:text="Senha" />
+        <EditText android:id="@+id/password" style="@style/SettingsField" android:inputType="textPassword" />
+
+        <TextView style="@style/SettingsLabel" android:text="Número de câmeras" />
+        <EditText android:id="@+id/channels" style="@style/SettingsField" android:inputType="number" />
+
+        <TextView style="@style/SettingsLabel" android:text="Layout da grade" />
+        <RadioGroup
+            android:id="@+id/layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton android:id="@+id/layout2" android:text="2×2 (4 por página)" android:textColor="#FFFFFF"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="24dp" />
+            <RadioButton android:id="@+id/layout3" android:text="3×3 (até 9)" android:textColor="#FFFFFF"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/save"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Salvar" />
+    </LinearLayout>
+</ScrollView>
