@@ -22,9 +22,12 @@ class Settings(context: Context) {
     var channels: Int
         get() = prefs.getInt("channels", 8)
         set(v) = prefs.edit().putInt("channels", v).apply()
+    var httpPort: Int
+        get() = prefs.getInt("httpPort", 80)
+        set(v) = prefs.edit().putInt("httpPort", v).apply()
     /** Grid columns: 2 (2x2) or 3 (3x3). */
     var columns: Int
-        get() = prefs.getInt("columns", 2)
+        get() = prefs.getInt("columns", 3)
         set(v) = prefs.edit().putInt("columns", v).apply()
 
     val isConfigured: Boolean get() = host.isNotBlank() && user.isNotBlank()

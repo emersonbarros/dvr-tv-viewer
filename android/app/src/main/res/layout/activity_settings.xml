@@ -22,6 +22,9 @@
         <TextView style="@style/SettingsLabel" android:text="Endereço IP" />
         <EditText android:id="@+id/host" style="@style/SettingsField" android:inputType="text" />
 
+        <TextView style="@style/SettingsLabel" android:text="Porta HTTP (página do DVR)" />
+        <EditText android:id="@+id/httpPort" style="@style/SettingsField" android:inputType="number" />
+
         <TextView style="@style/SettingsLabel" android:text="Porta RTSP" />
         <EditText android:id="@+id/port" style="@style/SettingsField" android:inputType="number" />
 

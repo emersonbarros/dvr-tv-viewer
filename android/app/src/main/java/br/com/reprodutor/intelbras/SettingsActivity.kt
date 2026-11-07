@@ -13,6 +13,7 @@ class SettingsActivity : AppCompatActivity() {
         setContentView(R.layout.activity_settings)
         val s = Settings(this)
         val host = findViewById<EditText>(R.id.host).apply { setText(s.host) }
+        val httpPort = findViewById<EditText>(R.id.httpPort).apply { setText(s.httpPort.toString()) }
         val port = findViewById<EditText>(R.id.port).apply { setText(s.port.toString()) }
         val user = findViewById<EditText>(R.id.user).apply { setText(s.user) }
         val password = findViewById<EditText>(R.id.password).apply { setText(s.password) }
@@ -26,6 +27,7 @@ class SettingsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             s.host = host.text.toString().trim()
+            s.httpPort = httpPort.text.toString().toIntOrNull() ?: 80
             s.port = port.text.toString().toIntOrNull() ?: 554
             s.user = user.text.toString().trim()
             s.password = password.text.toString()

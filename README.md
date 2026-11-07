@@ -25,9 +25,11 @@ Intelbras (MHDX 1108, base Dahua) **dentro da rede local**.
 ## Como funciona
 
 **Android TV**
-- Grade 2×2 ou 3×3 com o substream de cada câmera (`subtype=1`). OK abre a câmera em tela cheia com o
-  stream principal (`subtype=0`).
-- URL: `rtsp://IP:554/cam/realmonitor?channel=N&subtype=S`, com autenticação Digest feita pelo ExoPlayer.
+- Grade 2×2 ou 3×3 com snapshots (`/cgi-bin/snapshot.cgi`, autenticação Digest) atualizados continuamente.
+  Muitas TVs (ex.: Sony BRAVIA com MT5891) só têm **1 decodificador de vídeo**, então o vídeo ao vivo
+  fica só na tela cheia.
+- Tela cheia: RTSP com ExoPlayer, stream principal
+  (`rtsp://IP:554/cam/realmonitor?channel=N&subtype=0`). Se falhar, tenta o substream.
 
 **LG webOS**
 - O navegador da TV não toca RTSP. O app abre `ws://IP/rtspoverwebsocket` (o mesmo endpoint que a
@@ -48,7 +50,8 @@ cp local.properties.example local.properties   # ajuste sdk.dir (e, se quiser, u
 ./gradlew assembleRelease                       # app/build/outputs/apk/release/app-release.apk
 ```
 Sem `keystore.properties`, o build release é assinado com a chave de debug, o que basta para instalar
-direto na TV.
+direto na TV. Para instalar pela rede: ative as Opções do desenvolvedor e a depuração na TV, depois rode
+`adb connect IP_DA_TV:5555` e `adb install -r app-release.apk`.
 
 ### webOS
 ```sh
@@ -62,8 +65,6 @@ Para testar no navegador do computador, sirva a pasta `webos/` (ex.: `python3 -m
 `index.html`.
 
 ## Limitações conhecidas
-- No webOS, a grade é "quase ao vivo": cada câmera atualiza a cada 1 ou 2 segundos.
+- A grade é "quase ao vivo": cada câmera atualiza a cada 1 ou 2 segundos.
 - Na tela cheia, o atraso é de cerca de 2 segundos.
-- O app Android ainda usa um vídeo por quadro na grade. Em aparelhos com poucos decodificadores, pode
-  ser preciso usar a grade 2×2.
-- Testado em um único DVR e em uma única TV LG (webOS com Chrome 79).
+- Testado em um único DVR, em uma TV LG (webOS com Chrome 79) e em uma Sony BRAVIA (Android TV 9).

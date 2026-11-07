@@ -11,7 +11,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 /**
- * Camera grid. D-pad moves between cameras, OK opens fullscreen,
+ * Camera grid (snapshot tiles; live video only in fullscreen). D-pad moves between cameras, OK opens fullscreen,
  * MENU (or long-press OK) opens settings. Pressing left/right past the
  * edge of the grid switches page when there are more cameras than tiles.
  */
@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var settings: Settings
     private lateinit var grid: LinearLayout
     private lateinit var pageLabel: TextView
-    private val cells = mutableListOf<CameraCell>()
+    private val cells = mutableListOf<SnapshotCell>()
     private val cellViews = mutableListOf<View>()
     private var page = 0
     private var columns = 0
@@ -63,9 +63,9 @@ class MainActivity : AppCompatActivity() {
             val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
             grid.addView(row, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
             repeat(columns) {
-                val v = inflater.inflate(R.layout.camera_cell, row, false)
+                val v = inflater.inflate(R.layout.snapshot_cell, row, false)
                 row.addView(v, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f))
-                val cell = CameraCell(v, settings, preferMainStream = false)
+                val cell = SnapshotCell(v, settings)
                 v.setOnClickListener { if (cell.channel > 0) openFullscreen(cell.channel) }
                 v.setOnLongClickListener { openSettings(); true }
                 cells += cell
