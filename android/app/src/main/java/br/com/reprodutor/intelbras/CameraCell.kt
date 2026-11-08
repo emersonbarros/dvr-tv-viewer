@@ -10,6 +10,8 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.rtsp.RtspMediaSource
 import androidx.media3.ui.PlayerView
@@ -70,7 +72,8 @@ class CameraCell(
         val loadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(500, 2000, 250, 250)
             .build()
-        val p = ExoPlayer.Builder(root.context).setLoadControl(loadControl).build()
+        val p = ExoPlayer.Builder(root.context, softwareFirstRenderers(root.context))
+            .setLoadControl(loadControl).build()
         if (!preferMainStream) p.volume = 0f
         p.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(state: Int) {
@@ -116,3 +119,15 @@ class CameraCell(
         releasePlayer()
     }
 }
+
+/**
+ * Prefer Android's software decoders (OMX.google.*) over the hardware ones. The MediaTek
+ * hardware decoders on the Sony BRAVIA (MT5891) render the DVR's RTSP streams as
+ * green/magenta garbage, while the software decoders handle them correctly.
+ */
+@OptIn(UnstableApi::class)
+private fun softwareFirstRenderers(context: android.content.Context) =
+    DefaultRenderersFactory(context).setMediaCodecSelector { mime, secure, tunneling ->
+        MediaCodecSelector.DEFAULT.getDecoderInfos(mime, secure, tunneling)
+            .sortedBy { if (it.softwareOnly) 0 else 1 }
+    }
