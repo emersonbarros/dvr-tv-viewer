@@ -1,6 +1,7 @@
 // Grid tiles: periodically refreshed JPEG snapshots from the DVR
 // (/cgi-bin/snapshot.cgi, HTTP Digest auth). TVs only have a few hardware video
-// decoders, so live video is reserved for the fullscreen view.
+// decoders, so by default live video is reserved for the fullscreen view; with
+// "live grid" enabled, GridTile (gridtile.js) uses snapshots as the fallback.
 (function () {
   'use strict';
 
@@ -114,6 +115,16 @@
         self.timer = setTimeout(function () { if (gen === self.gen) self.loop(gen); }, delay);
       });
     });
+  };
+
+  /** Stop refreshing but keep the last image (live video is covering the tile). */
+  SnapshotTile.prototype.pause = function () {
+    this.gen++;
+    clearTimeout(this.timer);
+  };
+
+  SnapshotTile.prototype.resume = function () {
+    if (this.channel) this.loop(++this.gen);
   };
 
   SnapshotTile.prototype.stop = function () {

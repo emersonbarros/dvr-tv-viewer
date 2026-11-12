@@ -7,5 +7,6 @@ window.DVR_DEFAULTS = {
   user: '',
   password: '',
   channels: 8,
-  columns: 3              // 2 = 2x2 grid, 3 = 3x3 grid
+  columns: 3,             // 2 = 2x2 grid, 3 = 3x3 grid
+  liveGrid: 0             // 1 = live RTSP in the grid (snapshots as fallback); TVs have few decoders
 };

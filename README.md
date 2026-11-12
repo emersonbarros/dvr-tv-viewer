@@ -28,6 +28,10 @@ Intelbras (MHDX 1108, base Dahua) **dentro da rede local**.
 - Grade 2×2 ou 3×3 com snapshots (`/cgi-bin/snapshot.cgi`, autenticação Digest) atualizados continuamente.
   Muitas TVs (ex.: Sony BRAVIA com MT5891) só têm **1 decodificador de vídeo**, então o vídeo ao vivo
   fica só na tela cheia.
+- Grade ao vivo (opção nas configurações; ligada por padrão em tablet/celular, desligada em TV): cada
+  célula abre o substream RTSP e esconde o snapshot quando o vídeo começa. Se o vídeo falhar, volta para
+  os snapshots e tenta de novo com intervalo crescente.
+- Toque: deslizar para os lados troca de página; toque longo abre as configurações.
 - Tela cheia: RTSP com ExoPlayer, stream principal
   (`rtsp://IP:554/cam/realmonitor?channel=N&subtype=0`). Se falhar, tenta o substream.
 
@@ -37,6 +41,8 @@ Intelbras (MHDX 1108, base Dahua) **dentro da rede local**.
   `<video>` via MSE.
 - A TV só consegue decodificar poucos vídeos ao mesmo tempo. Por isso a grade mostra snapshots
   (`/cgi-bin/snapshot.cgi`) atualizados continuamente, e o vídeo ao vivo fica só na tela cheia.
+- Opção "Grade: Vídeo ao vivo" (desligada por padrão): mesmo esquema do Android, com os snapshots como
+  fallback quando o vídeo falha ou trava.
 
 **Controles**: setas navegam, OK abre a tela cheia, ◀ ▶ trocam a câmera em tela cheia, Voltar volta para
 a grade. Configurações: MENU / OK segurado (Android) ou botão vermelho (webOS).

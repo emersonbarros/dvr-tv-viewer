@@ -7,10 +7,14 @@
   var MAX_LATENCY = 3;     // seconds behind live edge before jumping forward
   var KEEP_BUFFER = 10;    // seconds of history kept in the SourceBuffer
 
-  function CameraPlayer(video, statusEl, settings) {
+  // hooks (optional): { onPlaying: fn, onFailure: fn } - used by grid tiles to swap
+  // between live video and snapshots.
+  function CameraPlayer(video, statusEl, settings, hooks) {
     this.video = video;
     this.statusEl = statusEl;
     this.settings = settings;
+    this.hooks = hooks || {};
+    this.playing = false;
     this.channel = 0;
     this.failures = 0;
     this.timer = null;
@@ -137,6 +141,7 @@
         this.lastTime = v.currentTime;
         this.lastProgress = Date.now();
         if (this.statusEl.textContent) { this.setStatus(''); this.failures = 0; }
+        if (!this.playing) { this.playing = true; this.failures = 0; if (this.hooks.onPlaying) this.hooks.onPlaying(); }
       }
     }
     if (Date.now() - this.lastProgress > 15000) this.retry('Sem imagem');
@@ -147,6 +152,7 @@
     this.failures++;
     this.teardown();
     this.setStatus(msg + '\nReconectando…');
+    if (this.hooks.onFailure) this.hooks.onFailure();
     // Exponential backoff with jitter so several tiles don't hammer the DVR at once.
     var delay = Math.min(30000, 3000 * Math.pow(2, Math.min(this.failures - 1, 4))) + Math.random() * 2000;
     this.timer = setTimeout(function () { if (self.channel === ch) self.connect(); }, delay);
@@ -154,6 +160,7 @@
 
   CameraPlayer.prototype.teardown = function () {
     this.gen = (this.gen || 0) + 1;
+    this.playing = false;
     clearInterval(this.watchdog);
     clearTimeout(this.timer);
     if (this.client) { this.client.close(); this.client = null; }
