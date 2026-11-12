@@ -14,6 +14,9 @@ html, body {
 .cell img { width: 100%; height: 100%; object-fit: contain; display: block; visibility: hidden; background: #111; }
 .cell video { width: 100%; height: 100%; object-fit: contain; background: #111; display: block; }
 .cell.live img { display: none; }
+/* Grid tiles fill the whole cell. The DVR sub stream is 704x480 (anamorphic 16:9),
+   so stretching is closer to the real proportions than letterboxing. */
+#grid .cell img, #grid .cell video { object-fit: fill; }
 .cell.empty { background: #080808; }
 .cell.focused { border: 4px solid #00c040; }
 .label {

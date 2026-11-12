@@ -10,7 +10,9 @@
 
     <!-- Live RTSP video (optional). Kept underneath the snapshot, which is hidden once
          the first video frame is rendered and shown again whenever the stream fails.
-         TextureView so it composes correctly with the overlays and the other tiles. -->
+         TextureView so it composes correctly with the overlays and the other tiles.
+         Video and snapshot are stretched to fill the tile: the DVR sub stream is 704x480
+         (anamorphic 16:9), so filling is closer to the real proportions than letterboxing. -->
     <androidx.media3.ui.PlayerView
         android:id="@+id/playerView"
         android:layout_width="match_parent"
@@ -18,7 +20,7 @@
         android:focusable="false"
         android:visibility="gone"
         app:use_controller="false"
-        app:resize_mode="fit"
+        app:resize_mode="fill"
         app:surface_type="texture_view"
         app:shutter_background_color="#111111" />
 
@@ -27,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#111111"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitXY" />
 
     <TextView
         android:id="@+id/status"
