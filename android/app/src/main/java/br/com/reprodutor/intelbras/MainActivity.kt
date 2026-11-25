@@ -2,8 +2,10 @@ package br.com.reprodutor.intelbras
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.GestureDetector
 import android.view.KeyEvent
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
 import android.widget.LinearLayout
@@ -11,9 +13,10 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 
 /**
- * Camera grid (snapshot tiles; live video only in fullscreen). D-pad moves between cameras, OK opens fullscreen,
+ * Camera grid: snapshot tiles, optionally upgraded to live RTSP sub stream (see [SnapshotCell]). D-pad moves between cameras, OK opens fullscreen,
  * MENU (or long-press OK) opens settings. Pressing left/right past the
  * edge of the grid switches page when there are more cameras than tiles.
+ * On touch screens, a horizontal swipe also switches page.
  */
 class MainActivity : AppCompatActivity() {
     private lateinit var settings: Settings
@@ -23,6 +26,20 @@ class MainActivity : AppCompatActivity() {
     private val cellViews = mutableListOf<View>()
     private var page = 0
     private var columns = 0
+
+    private val swipe by lazy {
+        GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, vx: Float, vy: Float): Boolean {
+                if (e1 == null || pageCount <= 1) return false
+                val dx = e2.x - e1.x
+                val dy = e2.y - e1.y
+                val minDistance = 80 * resources.displayMetrics.density
+                if (Math.abs(dx) < minDistance || Math.abs(dx) < 1.5f * Math.abs(dy)) return false
+                changePage(if (dx < 0) 1 else -1)
+                return true
+            }
+        })
+    }
 
     private val perPage get() = columns * columns
     private val pageCount get() = (settings.channels + perPage - 1) / perPage
@@ -79,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         cells.forEachIndexed { i, cell ->
             val ch = first + i
             if (ch <= settings.channels) {
-                cell.start(ch)
+                cell.start(ch, liveDelayMs = i * 300L)
                 cellViews[i].isFocusable = true
             } else {
                 cell.clear()
@@ -107,12 +124,31 @@ class MainActivity : AppCompatActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         when (keyCode) {
             KeyEvent.KEYCODE_DPAD_RIGHT, KeyEvent.KEYCODE_CHANNEL_UP, KeyEvent.KEYCODE_PAGE_DOWN ->
-                if (pageCount > 1) { page = (page + 1) % pageCount; showPage(); focusRow(edgeLeft = true); return true }
+                if (pageCount > 1) { changePage(1); focusRow(edgeLeft = true); return true }
             KeyEvent.KEYCODE_DPAD_LEFT, KeyEvent.KEYCODE_CHANNEL_DOWN, KeyEvent.KEYCODE_PAGE_UP ->
-                if (pageCount > 1) { page = (page - 1 + pageCount) % pageCount; showPage(); focusRow(edgeLeft = false); return true }
+                if (pageCount > 1) { changePage(-1); focusRow(edgeLeft = false); return true }
             KeyEvent.KEYCODE_MENU, KeyEvent.KEYCODE_SETTINGS -> { openSettings(); return true }
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    private fun changePage(delta: Int) {
+        page = (page + delta + pageCount) % pageCount
+        showPage()
+    }
+
+    /**
+     * Watch every touch for a horizontal swipe. When one is recognised, the tile under the finger
+     * gets ACTION_CANCEL instead of ACTION_UP so the swipe does not also open fullscreen.
+     */
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (swipe.onTouchEvent(ev) && ev.actionMasked == MotionEvent.ACTION_UP) {
+            val cancel = MotionEvent.obtain(ev).apply { action = MotionEvent.ACTION_CANCEL }
+            super.dispatchTouchEvent(cancel)
+            cancel.recycle()
+            return true
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     /** After a page change, keep focus on the same row at the opposite edge. */

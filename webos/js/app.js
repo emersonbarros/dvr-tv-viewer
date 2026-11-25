@@ -8,8 +8,8 @@
   };
 
   // ---- settings (localStorage, defaults from config.js / config.local.js) ----
-  var FIELDS = ['host', 'httpPort', 'rtspPort', 'user', 'password', 'channels', 'columns'];
-  var NUMERIC = { httpPort: 1, rtspPort: 1, channels: 1, columns: 1 };
+  var FIELDS = ['host', 'httpPort', 'rtspPort', 'user', 'password', 'channels', 'columns', 'liveGrid'];
+  var NUMERIC = { httpPort: 1, rtspPort: 1, channels: 1, columns: 1, liveGrid: 1 };
 
   function loadSettings() {
     var s = {}, saved = {};
@@ -55,7 +55,7 @@
       el.style.top = Math.floor(i / columns) * size + '%';
       el.style.width = size + '%';
       el.style.height = size + '%';
-      el.innerHTML = '<img alt=""><div class="label"></div><div class="status"></div>';
+      el.innerHTML = '<video autoplay muted playsinline></video><img alt=""><div class="label"></div><div class="status"></div>';
       gridEl.appendChild(el);
       (function (index) {
         el.addEventListener('click', function () { focus = index; openFull(); });
@@ -63,7 +63,7 @@
       cells.push({
         el: el,
         labelEl: el.querySelector('.label'),
-        player: new SnapshotTile(el.querySelector('img'), el.querySelector('.status'), settings)
+        player: new GridTile(el, settings)
       });
     }
   }
@@ -83,7 +83,7 @@
         c.el.classList.remove('empty');
         c.labelEl.textContent = 'CAM ' + ch;
         c.labelEl.style.display = '';
-        c.player.start(ch);
+        c.player.start(ch, i * 300);
       } else {
         c.el.classList.add('empty');
         c.labelEl.style.display = 'none';
@@ -191,10 +191,18 @@
     s.rtspPort = s.rtspPort || 554;
     s.channels = Math.min(Math.max(s.channels || 8, 1), 64);
     s.columns = s.columns === 3 ? 3 : 2;
+    s.liveGrid = s.liveGrid === 1 ? 1 : 0;
     for (var k in s) settings[k] = s[k]; // players hold a reference to this object
     saveSettings(settings);
     if (document.activeElement) document.activeElement.blur();
     showGrid();
+  });
+
+  // The webOS virtual keyboard covers the lower half of the screen without resizing the page,
+  // so scroll the focused field near the top (the form has extra bottom padding to allow it).
+  form.addEventListener('focusin', function (e) {
+    var el = e.target.closest ? e.target.closest('label') || e.target : e.target;
+    form.scrollTop = Math.max(0, el.offsetTop - 80);
   });
 
   function settingsKey(e) {

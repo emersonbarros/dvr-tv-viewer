@@ -1,11 +1,13 @@
 package br.com.reprodutor.intelbras
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 
 /** Persistent DVR connection settings. Defaults come from local.properties via BuildConfig. */
 class Settings(context: Context) {
     private val prefs = context.getSharedPreferences("dvr", Context.MODE_PRIVATE)
+    private val isTv = context.packageManager.hasSystemFeature(PackageManager.FEATURE_LEANBACK)
 
     var host: String
         get() = prefs.getString("host", BuildConfig.DEFAULT_HOST)!!
@@ -29,6 +31,14 @@ class Settings(context: Context) {
     var columns: Int
         get() = prefs.getInt("columns", 3)
         set(v) = prefs.edit().putInt("columns", v).apply()
+
+    /**
+     * Live RTSP video in the grid (sub stream), with snapshots as fallback. Off by default on TVs,
+     * which usually have a single video decoder; on by default on phones/tablets.
+     */
+    var liveGrid: Boolean
+        get() = prefs.getBoolean("liveGrid", !isTv)
+        set(v) = prefs.edit().putBoolean("liveGrid", v).apply()
 
     val isConfigured: Boolean get() = host.isNotBlank() && user.isNotBlank()
 

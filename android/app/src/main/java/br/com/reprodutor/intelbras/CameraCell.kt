@@ -126,7 +126,7 @@ class CameraCell(
  * green/magenta garbage, while the software decoders handle them correctly.
  */
 @OptIn(UnstableApi::class)
-private fun softwareFirstRenderers(context: android.content.Context) =
+internal fun softwareFirstRenderers(context: android.content.Context) =
     DefaultRenderersFactory(context).setMediaCodecSelector { mime, secure, tunneling ->
         MediaCodecSelector.DEFAULT.getDecoderInfos(mime, secure, tunneling)
             .sortedBy { if (it.softwareOnly) 0 else 1 }
